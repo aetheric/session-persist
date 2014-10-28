@@ -1,0 +1,9 @@
+[submodule "lib/angular-storage"]
+	path = lib/angular-storage
+	url = git@github.com:gsklee/ngStorage.git
+[submodule "lib/angular-websocket"]
+	path = lib/angular-websocket
+	url = git@github.com:gdi2290/angular-websocket.git
+[submodule "lib/requirejs"]
+	path = lib/requirejs
+	url = git@github.com:jrburke/requirejs.git
