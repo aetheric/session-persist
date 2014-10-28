@@ -1,6 +1,8 @@
-'use strict';
-
-(function() {
+define([
+	'angular',
+	'angular-storage',
+	'angular-websocket'
+], function(angular) {
 
 	angular.module('sessiondb', [
 		'ngStorage'
@@ -35,4 +37,4 @@
 		}
 	]);
 
-})();
+});
