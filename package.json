@@ -1,0 +1,24 @@
+{
+  "name": "session-persist",
+  "version": "1.0.0",
+  "description": "A session persistence and syncing framework.",
+  "main": "gulpfile.js",
+  "scripts": {
+    "test": "gulp test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:aetheric/session-persist.git"
+  },
+  "keywords": [
+    "session",
+    "websocket",
+    "html5"
+  ],
+  "author": "Peter Cummuskey <peterc@aetheric.co.nz>",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/aetheric/session-persist/issues"
+  },
+  "homepage": "https://github.com/aetheric/session-persist"
+}
