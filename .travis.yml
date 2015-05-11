@@ -1,0 +1,10 @@
+language: node_js
+node_js:
+    - "0.10"
+deploy:
+    provider: npm
+    email: peterc@aetheric.co.nz
+    skip_cleanup: true
+    api_key:
+    on:
+        tags: true
