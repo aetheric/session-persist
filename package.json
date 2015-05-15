@@ -1,10 +1,10 @@
 {
-  "name": "session-persist",
+  "name": "session-synch",
   "version": "1.0.0",
   "description": "A session persistence and syncing framework.",
   "main": "gulpfile.js",
   "scripts": {
-    "pack": "gulp pack",
+    "dist": "gulp dist",
     "test": "gulp test"
   },
   "repository": {
@@ -23,6 +23,7 @@
   },
   "homepage": "https://github.com/aetheric/session-persist",
   "devDependencies": {
-    "gulp": "^3.8.11"
+    "gulp": "^3.8.11",
+    "gulp-uglify": "^1.2.0"
   }
 }

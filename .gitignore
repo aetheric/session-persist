@@ -1,7 +1,13 @@
 
 # npm
 node_modules/
+dist/
 
 # misc
 *.log
 
+# IntelliJ
+.idea/
+*.iml
+*.ipr
+*.iws
