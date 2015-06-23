@@ -1,0 +1,22 @@
+
+message Update {
+	repeated Change change = 1;
+}
+
+message Change {
+
+	required Kind kind = 1;
+	repeated string path = 2;
+	optional string lhs = 3;
+	optional string rhs = 4;
+	optional uint32 index = 5;
+	optional string item = 6;
+
+	enum Kind {
+		N = 0;
+		D = 1;
+		E = 2;
+		A = 3;
+	}
+
+}

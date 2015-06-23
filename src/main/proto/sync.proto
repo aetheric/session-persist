@@ -1,6 +1,0 @@
-message sync {
-	required string path = 1;
-	required string value = 2;
-	required string etag = 3;
-	required int32 count = 4 [default = 0];
-}

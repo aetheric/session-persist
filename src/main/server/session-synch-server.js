@@ -4,13 +4,13 @@ var _ = require('underscore');
 var events = require('events');
 var diff = require('deep-diff');
 
-var sync = require('../proto/sync.proto.js');
+var update = require('../proto/update.proto.js');
 
 var EventEmitter = events.EventEmitter;
 var performDiff = diff.diff;
 var applyChange = diff.applyChange;
 
-var Sync = sync.build('sync');
+var Update = update.build('Update');
 
 module.exports = function SessionSynch(websocket, model) {
 	var self = this;
@@ -34,7 +34,7 @@ module.exports = function SessionSynch(websocket, model) {
 	websocket.on('message', function(message) {
 
 		// parse protocol buffer message
-		var changes = new Sync().decode64(message).toRaw();
+		var changes = new Update().decode64(message).toRaw();
 
 		// apply the received changes and avoid broadcast.
 		applyChange(self.model, self.prev, changes);
@@ -51,7 +51,7 @@ module.exports = function SessionSynch(websocket, model) {
 		if (changes && changes.length) {
 
 			// Create the encoded payload from the changes.
-			var payload = new Sync(changes).encode().toBase64();
+			var payload = new Update(changes).encode().toBase64();
 
 			// Send the encoded payload across the wire.
 			websocket.emit(payload);
