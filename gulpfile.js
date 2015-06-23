@@ -5,25 +5,17 @@ var uglify = require('gulp-uglify');
 var nightwatch = require('gulp-nightwatch-headless');
 var utils = require('gulp-util');
 var mocha = require('gulp-mocha');
-var ProtoBuf = require('protobufjs');
-var rename = require('gulp-rename');
-var through = require('gulp-through');
+var protobuf = require('gulp-protobufjs');
 
-var ProtoParser = ProtoBuf.DotProto.Parser;
+var proto_dest = gulp.dest('src/main/proto', {
+	cwd: __dirname + '/src/main/proto'
+});
 
 gulp.task('proto', function() {
-
-	gulp.src('src/main/proto/*.proto')
-		.pipe(through('proto', function(file) {
-			var object = new ProtoParser(file.contents, file.path)
-				.parse();
-			file.contents = new Buffer(JSON.stringify(object));
-		})())
-		.pipe(rename({
-			extname: '.json'
-		}))
-		.pipe(gulp.dest('dist'));
-
+	return gulp.src('src/main/proto/*.proto')
+		.pipe(protobuf())
+		.pipe(proto_dest)
+		.on('error', utils.log);
 });
 
 gulp.task('test', [

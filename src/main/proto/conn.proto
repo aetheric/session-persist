@@ -1,3 +1,0 @@
-message conn {
-	optional string session = 1;
-}

@@ -25,16 +25,19 @@
   "devDependencies": {
     "chai": "^2.3.0",
     "gulp": "^3.8.11",
+    "gulp-browserify": "^0.5.1",
     "gulp-mocha": "^2.0.1",
     "gulp-nightwatch-headless": "^1.0.4",
+    "gulp-protobufjs": "^1.0.2",
     "gulp-rename": "^1.2.2",
-    "gulp-through": "^0.3.0",
     "gulp-uglify": "^1.2.0",
     "gulp-util": "^3.0.4",
-    "protobufjs": "^4.0.0-b3"
+    "through2": "^2.0.0"
   },
   "dependencies": {
+    "deep-diff": "^0.3.2",
     "promise": "^7.0.1",
-    "underscore": "^1.8.3"
+    "underscore": "^1.8.3",
+    "protobufjs": "^4.0.0-b3"
   }
 }

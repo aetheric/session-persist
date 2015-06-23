@@ -1,5 +1,9 @@
 /* globals module, define, sessionStorage */
 
+var sync = require('../proto/sync.proto.js');
+
+var Sync = sync.build('sync');
+
 (function(){
 
 	function init() {

@@ -7,6 +7,7 @@ out/
 
 # misc
 *.log
+*.proto.*
 
 # IntelliJ
 .idea/
