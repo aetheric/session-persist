@@ -1,5 +1,7 @@
 /* globals module, define, sessionStorage */
 
+var socket = require('ws');
+
 var sync = require('../proto/update.proto.js');
 
 var Update = sync.build('Update');
