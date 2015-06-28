@@ -6,3 +6,22 @@ asynchronously. This allows an angular application to be built entirely off html
 and means that the client data can be kept up-to-date at all times. User requests are handled as session-scoped queues,
 and therefore support offline web-application functionality.
 
+=== Entity
+
+A document indexed by id controlled by the server.
+
+=== Collection
+
+An array of entity ids controlled by the server.
+
+=== Form
+
+A form object controlled by the client.
+
+=== Comment
+
+A comment on a form or form field controlled by the server.
+
+=== Action
+
+An action to be executed on the server. Controlled by the client.
