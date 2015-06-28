@@ -1,5 +1,5 @@
-SESSIONDB
-=========
+SOCKIT
+======
 
 This project is designed to create a database that synchronises client session data with a configured websocket host
 asynchronously. This allows an angular application to be built entirely off html5 local and session storage technology,

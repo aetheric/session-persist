@@ -4,13 +4,11 @@ var _ = require('underscore');
 var events = require('events');
 var diff = require('deep-diff');
 
-var update = require('../proto/update.proto.js');
+var Update = require('../proto/update.proto.js');
 
 var EventEmitter = events.EventEmitter;
 var performDiff = diff.diff;
 var applyChange = diff.applyChange;
-
-var Update = update.build('Update');
 
 module.exports = function SessionSynch(websocket, model) {
 	var self = this;

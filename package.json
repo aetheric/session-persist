@@ -1,41 +1,44 @@
 {
-  "name": "session-synch",
-  "version": "1.0.0",
+  "name": "sockit",
+  "version": "0.0.1",
   "description": "A session persistence and syncing framework.",
+  "homepage": "https://github.com/aetheric/sockit",
+  "author": "Peter Cummuskey <peterc@aetheric.co.nz> (http://gplus.to/tzrlk/)",
+  "license": "MIT",
   "main": "gulpfile.js",
-  "scripts": {
-    "dist": "gulp dist",
-    "test": "gulp test"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git@github.com:aetheric/session-persist.git"
-  },
   "keywords": [
     "session",
     "websocket",
     "html5"
   ],
-  "author": "Peter Cummuskey <peterc@aetheric.co.nz>",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/aetheric/session-persist/issues"
+  "scripts": {
+    "build": "gulp build",
+    "test": "gulp test"
   },
-  "homepage": "https://github.com/aetheric/session-persist",
+  "repository": {
+    "type": "git",
+    "url": "git@github.com:aetheric/sockit.git"
+  },
+  "bugs": {
+    "url": "https://github.com/aetheric/sockit/issues"
+  },
   "devDependencies": {
-    "chai": "^2.3.0",
+    "chai": "^3.0.0",
     "gulp": "^3.8.11",
     "gulp-browserify": "^0.5.1",
+    "gulp-istanbul": "^0.10.0",
     "gulp-mocha": "^2.0.1",
-    "gulp-nightwatch-headless": "^1.0.4",
     "gulp-protobufjs": "^1.0.2",
     "gulp-rename": "^1.2.2",
     "gulp-sourcemaps": "^1.5.2",
     "gulp-uglify": "^1.2.0",
     "gulp-util": "^3.0.4",
+    "karma": "^0.12.36",
+    "mocha": "^2.2.5",
+    "phantomjs": "^1.9.17",
+    "sinon": "^1.15.3",
     "through2": "^2.0.0",
-    "vinyl-buffer": "^1.0.0",
-    "vinyl-source-stream": "^1.1.0"
+    "vinyl-buffer": "^1.0.0"
   },
   "dependencies": {
     "deep-diff": "^0.3.2",

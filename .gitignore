@@ -7,10 +7,13 @@ out/
 
 # misc
 *.log
-*.proto.*
 
 # IntelliJ
 .idea/
 *.iml
 *.ipr
 *.iws
+
+# build
+*.proto.*
+test-results.xml
