@@ -7,8 +7,6 @@ var diff = require('deep-diff');
 var Update = require('../proto/update.proto.js');
 
 var EventEmitter = events.EventEmitter;
-var performDiff = diff.diff;
-var applyChange = diff.applyChange;
 
 module.exports = function SessionSynch(websocket, model) {
 	var self = this;
@@ -18,46 +16,55 @@ module.exports = function SessionSynch(websocket, model) {
 	self.model = model || {};
 	self.prev = {};
 	self.update = {};
-	self.scan = true;
 	self.$on = emitter.on;
 
-	function update(changes) {
-		self.prev = _.clone(self.model);
-		_.each(changes, function(change) {
-			var path = change.path.join('.');
-			emitter.emit(path, change);
-		});
+	function update(change) {
+		var path = change.path.join('.');
+		emitter.emit(path, change);
 	}
 
 	websocket.on('message', function(message) {
 
 		// parse protocol buffer message
-		var changes = new Update().decode64(message).toRaw();
+		var change = new Update().decode64(message).toRaw();
 
 		// apply the received changes and avoid broadcast.
-		applyChange(self.model, self.prev, changes);
+		diff.applyChange(self.model, self.prev, [ change ]);
 
 		// publish the updates.
-		update(changes);
+		update(change);
+
+		// Reset the 'previous' item to avoid cyclical updates.
+		self.prev = _.clone(self.model);
 
 	});
 
 	/** self-rescheduling function */
 	function scan() {
 
-		var changes = performDiff(self.prev, self.model);
-		if (changes && changes.length) {
+		// Get the difference between this and the previous item.
+		var changes = diff.performDiff(self.prev, self.model);
+		if (_.isEmpty(changes)) {
+			process.nextTick(scan);
+			return;
+		}
+
+		// For each change detected
+		_.each(changes, function (change) {
 
 			// Create the encoded payload from the changes.
-			var payload = new Update(changes).encode().toBase64();
+			var payload = new Update(change).encode().toBase64();
 
 			// Send the encoded payload across the wire.
 			websocket.emit(payload);
 
-			// Publish the updates.
-			update(changes);
+			// Emit the change locally as well.
+			update(change)
 
-		}
+		});
+
+		// Reset the 'previous' item.
+		self.prev = _.clone(self.model);
 
 		// Reschedule for next tick.
 		process.nextTick(scan);

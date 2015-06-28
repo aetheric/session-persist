@@ -1,10 +1,5 @@
 
 message Update {
-	repeated Change change = 1;
-}
-
-message Change {
-
 	required Kind kind = 1;
 	repeated string path = 2;
 	optional string lhs = 3;

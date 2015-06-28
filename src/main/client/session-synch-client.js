@@ -22,25 +22,33 @@ var Update = require('../proto/update.proto.js');
 			self.socket.on('message', function(message) {
 
 				// Decode the incoming message.
-				var changes = new Update().decode64(message).toRaw();
+				var change = new Update().decode64(message).toRaw();
 
 				// Apply the received changes to the session storage.
-				diff.applyChanges(self.previous, self.session, changes);
+				diff.applyChange(self.previous, self.session, [ change ]);
 
+				// Reset previous to avoid cyclical updates.
 				self.previous = _.clone(self.session);
 
 			});
 
 			root.on('storage', function() {
 
+				// Calculate changes.
 				var changes = diff.diff(self.previous, self.session);
-				if (!(changes && changes.length)) {
+				if (_.isEmpty(changes)) {
 					return;
 				}
 
-				var payload = new Update(changes).encode().toBase64();
+				_.each(changes, function(change) {
 
-				self.socket.emit(payload);
+					// Encode the change into a protocol buffer.
+					var payload = new Update(change).encode().toBase64();
+
+					// Send it down the socket.
+					self.socket.emit(payload);
+
+				});
 
 				self.previous = _.clone(self.session);
 
