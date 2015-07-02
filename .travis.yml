@@ -1,7 +1,7 @@
 language: node_js
 node_js:
     - "0.10"
-before_deploy: npm call dist
+before_deploy: npm call build
 deploy:
     provider: npm
     email: peterc@aetheric.co.nz

@@ -3,5 +3,5 @@
 var gulp = require('gulp');
 
 gulp.task('proto', require('./src/gulp/proto'));
-gulp.task('client', [ 'proto' ], require('./src/gulp/client'));
-gulp.task('test', [ 'client' ], require('./src/gulp/test'));
+gulp.task('build', [ 'proto' ], require('./src/gulp/build'));
+gulp.task('test', [ 'build' ], require('./src/gulp/test'));

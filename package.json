@@ -5,7 +5,7 @@
   "homepage": "https://github.com/aetheric/sockit",
   "author": "Peter Cummuskey <peterc@aetheric.co.nz> (http://gplus.to/tzrlk/)",
   "license": "MIT",
-  "main": "gulpfile.js",
+  "main": "src/main/server/session-synch-server.js",
   "keywords": [
     "session",
     "websocket",
