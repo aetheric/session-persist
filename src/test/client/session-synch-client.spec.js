@@ -1,8 +1,9 @@
-/* globals require, describe, beforeEach, it, window */
+/* globals require, describe, beforeEach, afterEach, it, window */
 
 var expect = require('chai').expect;
 var WebSocket = require('ws');
 var sinon = require('sinon');
+var async = require('node-async');
 
 var Client = require('../../main/client/session-synch-client');
 var Update = require('../../main/proto/update.proto.js');
@@ -15,7 +16,6 @@ describe('The session sync client', function() {
 
 	beforeEach(function() {
 
-		var server;
 		for (var port = 8000; port < 10000; port++) {
 			try {
 				server = new WebSocket.Server({
@@ -31,6 +31,14 @@ describe('The session sync client', function() {
 			throw new Error('Unable to start server.');
 		}
 
+		server.on('connect', function(socket) {
+			console.log('Server receieved socket connection');
+		});
+
+		server.on('message', function(message, flags) {
+			console.log('Server received messsge: ' + message);
+		});
+
 		browser = {
 
 			location: 'http://localhost:' + port + '/',
@@ -45,6 +53,20 @@ describe('The session sync client', function() {
 
 		client = new Client(browser);
 
+		client.socket.on('open', function() {
+			console.log('Client opened socket.');
+		});
+
+		client.socket.on('message', function(message, flags) {
+			console.log('Client received message: ' + message);
+		});
+
+	});
+
+	afterEach(function() {
+
+		server && server.close();
+
 	});
 
 	it('should connect as soon as initialised', function(done) {
@@ -55,15 +77,16 @@ describe('The session sync client', function() {
 
 		expect(browser.sessionStorage.blah).to.equal('argh');
 
-		function monitor() {
-			if (browser.sessionStorage.blah === 'flargle') {
-				done();
-			} else {
-				process.nextTick(monitor);
-			}
-		}
+		var scanning = true;
 
-		process.nextTick(monitor);
+		async.whilst(function() {
+			return scanning;
+		}, function monitor() {
+			if (browser.sessionStorage.blah === 'flargle') {
+				console.log('blah = flargle');
+				done();
+			}
+		});
 
 		var changes = [
 			{
@@ -73,7 +96,8 @@ describe('The session sync client', function() {
 			}
 		];
 
-		server.on('open', function(socket) {
+		server.on('connection', function(socket) {
+			console.log('Sending update down websocket');
 			socket.emit(new Update(changes).encode().toBase64());
 		});
 
