@@ -3,10 +3,13 @@
 var expect = require('chai').expect;
 var WebSocket = require('ws');
 var sinon = require('sinon');
-var async = require('node-async');
+var async = require('async');
+var proto = require('protobufjs');
 
+var Update_json = require('../../main/proto/update.proto.json');
 var Client = require('../../main/client/session-synch-client');
-var Update = require('../../main/proto/update.proto.js');
+
+var Update = proto.loadJson(Update_json).build('Update');
 
 describe('The session sync client', function() {
 
@@ -88,17 +91,15 @@ describe('The session sync client', function() {
 			}
 		});
 
-		var changes = [
-			{
-				type: 'A',
-				path: [ 'blah' ],
-				value: 'flargle'
-			}
-		];
+		var changes = new Update({
+			kind: 'A',
+			path: [ 'blah' ],
+			item: 'flargle'
+		}).encode().toBase64();
 
 		server.on('connection', function(socket) {
 			console.log('Sending update down websocket');
-			socket.emit(new Update(changes).encode().toBase64());
+			socket.send(changes);
 		});
 
 	});
@@ -113,7 +114,7 @@ describe('The session sync client', function() {
 			done();
 		});
 
-		window.sessionStorage.blah = 'flargle';
+		browser.sessionStorage.blah = 'flargle';
 
 	});
 

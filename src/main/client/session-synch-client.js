@@ -3,8 +3,11 @@
 var _ = require('underscore');
 var WebSocket = require('ws');
 var diff = require('deep-diff');
+var proto = require('protobufjs');
 
-var Update = require('../proto/update.proto.js');
+var json = require('../proto/update.proto.json');
+
+var Update = proto.loadJson(json).build('Update');
 
 (function(root){
 
@@ -22,7 +25,7 @@ var Update = require('../proto/update.proto.js');
 			self.socket.on('message', function(message) {
 
 				// Decode the incoming message.
-				var change = new Update().decode64(message).toRaw();
+				var change = Update.decode64(message).toRaw();
 
 				// Apply the received changes to the session storage.
 				diff.applyChange(self.previous, self.session, [ change ]);
