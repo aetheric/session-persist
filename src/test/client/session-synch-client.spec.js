@@ -1,10 +1,12 @@
 /* globals require, describe, beforeEach, afterEach, it, window */
 
+var _ = require('underscore');
 var expect = require('chai').expect;
 var WebSocket = require('ws');
 var sinon = require('sinon');
-var async = require('async');
+var repeat = require('repeat');
 var proto = require('protobufjs');
+var diff = require('deep-diff');
 
 var Update_json = require('../../main/proto/update.proto.json');
 var Client = require('../../main/client/session-synch-client');
@@ -16,6 +18,7 @@ describe('The session sync client', function() {
 	var client;
 	var server;
 	var browser;
+	var listeners;
 
 	beforeEach(function() {
 
@@ -42,12 +45,17 @@ describe('The session sync client', function() {
 			console.log('Server received messsge: ' + message);
 		});
 
+		listeners = {};
+
 		browser = {
 
 			location: 'http://localhost:' + port + '/',
 
 			sessionStorage: {
-				blah: 'argh'
+				blah: 'argh',
+				on: function(event, callback) {
+					(listeners[event] || (listeners[event] = [])).push(callback);
+				}
 			},
 
 			on: sinon.spy()
@@ -82,20 +90,25 @@ describe('The session sync client', function() {
 
 		var scanning = true;
 
-		async.whilst(function() {
-			return scanning;
-		}, function monitor() {
+		repeat(function() {
 			if (browser.sessionStorage.blah === 'flargle') {
 				console.log('blah = flargle');
+				scanning = false;
 				done();
 			}
+		}).async().until(function() {
+			return !scanning;
+		}).start().then(function() {
+			console.log('Monitor completed watching.');
+		}, function(error) {
+			console.error(error.stack);
 		});
 
-		var changes = new Update({
-			kind: 'A',
-			path: [ 'blah' ],
-			item: 'flargle'
-		}).encode().toBase64();
+		var delta = diff.diff(browser.sessionStorage, _.extend({}, browser.sessionStorage, {
+			blah: 'flargle'
+		}));
+
+		var changes = new Update(_.first(delta)).encode().toBase64();
 
 		server.on('connection', function(socket) {
 			console.log('Sending update down websocket');
@@ -115,6 +128,9 @@ describe('The session sync client', function() {
 		});
 
 		browser.sessionStorage.blah = 'flargle';
+		_.each(listeners.storage, function(listener) {
+			listener({}, {});
+		});
 
 	});
 

@@ -28,17 +28,31 @@ var Update = proto.loadJson(json).build('Update');
 				var change = Update.decode64(message).toRaw();
 
 				// Apply the received changes to the session storage.
-				diff.applyChange(self.previous, self.session, [ change ]);
+				diff.applyChange(self.session, true, change);
 
 				// Reset previous to avoid cyclical updates.
 				self.previous = _.clone(self.session);
 
 			});
 
-			root.on('storage', function() {
+			self.session.on('storage', function() {
 
 				// Calculate changes.
-				var changes = diff.diff(self.previous, self.session);
+				var changes = diff.diff(self.previous, self.session, function(path, key) {
+
+					var chain = [].concat(path, key);
+
+					function reducer(memo, item) {
+						return memo && memo[item];
+					}
+
+					var value = _.reduce(chain, reducer, self.session)
+							|| _.reduce(chain, reducer, self.previous);
+
+					return _.isFunction(value);
+
+				});
+
 				if (_.isEmpty(changes)) {
 					return;
 				}
@@ -49,7 +63,7 @@ var Update = proto.loadJson(json).build('Update');
 					var payload = new Update(change).encode().toBase64();
 
 					// Send it down the socket.
-					self.socket.emit(payload);
+					self.socket.send(payload);
 
 				});
 
