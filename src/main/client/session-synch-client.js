@@ -20,7 +20,7 @@ var Update = proto.loadJson(json).build('Update');
 			self.session = root.sessionStorage;
 			self.previous = {};
 
-			self.socket = new WebSocket(root.location.replace('^http', 'ws'));
+			self.socket = new WebSocket(root.location/*.replace('^http', 'ws')*/);
 
 			self.socket.on('message', function(message) {
 
@@ -35,6 +35,11 @@ var Update = proto.loadJson(json).build('Update');
 
 			});
 
+			self.pendingChanges = [];
+			self.changeProcessor = function(change) {
+				self.pendingChanges.push(change);
+			};
+
 			self.session.on('storage', function() {
 
 				// Calculate changes.
@@ -47,7 +52,7 @@ var Update = proto.loadJson(json).build('Update');
 					}
 
 					var value = _.reduce(chain, reducer, self.session)
-							|| _.reduce(chain, reducer, self.previous);
+						|| _.reduce(chain, reducer, self.previous);
 
 					return _.isFunction(value);
 
@@ -57,17 +62,27 @@ var Update = proto.loadJson(json).build('Update');
 					return;
 				}
 
-				_.each(changes, function(change) {
+				_.each(changes, self.changeProcessor);
+
+				self.previous = _.clone(self.session);
+
+			});
+
+			self.socket.on('open', function() {
+				var socket = this;
+
+				self.changeProcessor = function(change) {
 
 					// Encode the change into a protocol buffer.
 					var payload = new Update(change).encode().toBase64();
 
 					// Send it down the socket.
-					self.socket.send(payload);
+					console.log('Sending update down websocket.');
+					socket.send(payload);
 
-				});
+				};
 
-				self.previous = _.clone(self.session);
+				_.each(self.pendingChanges, self.changeProcessor);
 
 			});
 

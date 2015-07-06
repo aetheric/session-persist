@@ -37,12 +37,12 @@ describe('The session sync client', function() {
 			throw new Error('Unable to start server.');
 		}
 
-		server.on('connect', function(socket) {
-			console.log('Server receieved socket connection');
-		});
+		server.on('connection', function(socket) {
+			console.log('Server received socket connection');
 
-		server.on('message', function(message, flags) {
-			console.log('Server received messsge: ' + message);
+			server.on('message', function(message, flags) {
+				console.log('Server received message: ' + message);
+			});
 		});
 
 		listeners = {};
@@ -56,9 +56,7 @@ describe('The session sync client', function() {
 				on: function(event, callback) {
 					(listeners[event] || (listeners[event] = [])).push(callback);
 				}
-			},
-
-			on: sinon.spy()
+			}
 
 		};
 
@@ -119,12 +117,14 @@ describe('The session sync client', function() {
 
 	it('should send a websocket message on change of the session.', function(done) {
 
-		server.on('message', function(message) {
-			expect(message).to.be.ok;
-			var changes = new Update().decode64(message).toRaw();
-			expect(changes).to.be.ok;
-			expect(changes).to.not.be.empty;
-			done();
+		server.on('connection', function(socket) {
+			socket.on('message', function(message) {
+				expect(message).to.be.ok;
+				var changes = Update.decode64(message).toRaw();
+				expect(changes).to.be.ok;
+				expect(changes).to.not.be.empty;
+				done();
+			});
 		});
 
 		browser.sessionStorage.blah = 'flargle';
