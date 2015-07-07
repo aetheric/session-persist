@@ -81,10 +81,12 @@ describe('The session sync client', function() {
 	});
 
 	it('should connect as soon as initialised', function(done) {
-		client.socket.on('open', done);
+		var complete = _.once(done);
+		client.socket.on('open', complete);
 	});
 
 	it('should alter the session on receipt of websocket messages.', function(done) {
+		var complete = _.once(done);
 
 		expect(browser.sessionStorage.blah).to.equal('argh');
 
@@ -94,7 +96,7 @@ describe('The session sync client', function() {
 			if (browser.sessionStorage.blah === 'flargle') {
 				console.log('blah = flargle');
 				scanning = false;
-				done();
+				complete();
 			}
 		}).async().until(function() {
 			return !scanning;
@@ -118,6 +120,7 @@ describe('The session sync client', function() {
 	});
 
 	it('should send a websocket message on change of the session.', function(done) {
+		var complete = _.once(done);
 
 		server.on('connection', function(socket) {
 			socket.on('message', function(message) {
@@ -125,7 +128,7 @@ describe('The session sync client', function() {
 				var changes = Update.decode64(message).toRaw();
 				expect(changes).to.be.ok;
 				expect(changes).to.not.be.empty;
-				done();
+				complete();
 			});
 		});
 
