@@ -17,3 +17,5 @@ out/
 # build
 *.proto.*
 test-results.xml
+coverage/
+

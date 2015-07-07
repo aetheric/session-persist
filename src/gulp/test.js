@@ -17,7 +17,7 @@ var config_istanbul_thresholds = {
 };
 
 module.exports = function(done) {
-	return gulp.src('src/main/**/*.js')
+	gulp.src('src/main/**/*.js')
 		.pipe(istanbul())
 		.pipe(istanbul.hookRequire())
 		.on('finish', function() {
