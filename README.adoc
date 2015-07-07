@@ -1,6 +1,8 @@
 SOCKIT
 ======
 
+image:https://travis-ci.org/aetheric/sockit.svg?branch=master["Build Status", link="https://travis-ci.org/aetheric/sockit"]
+
 This project is designed to create a database that synchronises client session data with a configured websocket host
 asynchronously. This allows an angular application to be built entirely off html5 local and session storage technology,
 and means that the client data can be kept up-to-date at all times. User requests are handled as session-scoped queues,
