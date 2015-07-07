@@ -1,0 +1,5 @@
+src/test/
+src/gulp/
+.travis.yml
+gulpfile.js
+!src/main/proto/update.proto.json

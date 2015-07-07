@@ -3,12 +3,15 @@
 var _ = require('underscore');
 var events = require('events');
 var diff = require('deep-diff');
+var path = require('path');
+var proto = require('protobufjs');
 
-var Update = require('../proto/update.proto.js');
+var Update_json = require(path.join(__dirname, '../proto/update.proto.json'));
+var Update = proto.loadJson(Update_json).build('Update');
 
 var EventEmitter = events.EventEmitter;
 
-module.exports = function SessionSynch(websocket, model) {
+module.exports = function SessionSynch(websocket, model, listeners) {
 	var self = this;
 
 	var emitter = new EventEmitter();
@@ -16,7 +19,11 @@ module.exports = function SessionSynch(websocket, model) {
 	self.model = model || {};
 	self.prev = {};
 	self.update = {};
-	self.$on = emitter.on;
+	self.on = emitter.on;
+
+	_.each(listeners, function(listener, eventKey) {
+		self.on(eventKey, listener);
+	});
 
 	function update(change) {
 		var path = change.path.join('.');

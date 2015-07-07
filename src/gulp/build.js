@@ -11,10 +11,20 @@ var sourcemaps = require('gulp-sourcemaps');
 var config_browserify = {
 	debug: true,
 	shim: {
+
+		//bytebuffer: {
+			//path: 'node_modules/protobufjs/node_modules/bytebuffer/index.js'
+			//exports: 'ByteBuffer'
+		//},
+
 		protobufjs: {
 			path: 'node_modules/protobufjs/dist/ProtoBuf.noparse.js',
-			exports: 'ProtoBuf'
+			exports: 'ProtoBuf',
+			depends: {
+				bytebuffer: 'bytebuffer'
+			}
 		}
+
 	}
 };
 

@@ -4,96 +4,84 @@ var _ = require('underscore');
 var WebSocket = require('ws');
 var diff = require('deep-diff');
 var proto = require('protobufjs');
+var path = require('path');
 
-var json = require('../proto/update.proto.json');
+var json = require(path.join(__dirname, '../proto/update.proto.json'));
 
 var Update = proto.loadJson(json).build('Update');
 
-(function(root){
+module.exports = function(window) {
+	var self = this;
 
-	function init() {
-		return function(window) {
-			var self = this;
+	var root = window || root;
 
-			var root = window || root;
+	self.session = root.sessionStorage;
+	self.previous = {};
 
-			self.session = root.sessionStorage;
-			self.previous = {};
+	self.socket = new WebSocket(root.location/*.replace('^http', 'ws')*/);
 
-			self.socket = new WebSocket(root.location/*.replace('^http', 'ws')*/);
+	self.socket.on('message', function(message) {
 
-			self.socket.on('message', function(message) {
+		// Decode the incoming message.
+		var change = Update.decode64(message).toRaw();
 
-				// Decode the incoming message.
-				var change = Update.decode64(message).toRaw();
+		// Apply the received changes to the session storage.
+		diff.applyChange(self.session, true, change);
 
-				// Apply the received changes to the session storage.
-				diff.applyChange(self.session, true, change);
+		// Reset previous to avoid cyclical updates.
+		self.previous = _.clone(self.session);
 
-				// Reset previous to avoid cyclical updates.
-				self.previous = _.clone(self.session);
+	});
 
-			});
+	self.pendingChanges = [];
+	self.changeProcessor = function(change) {
+		self.pendingChanges.push(change);
+	};
 
-			self.pendingChanges = [];
-			self.changeProcessor = function(change) {
-				self.pendingChanges.push(change);
-			};
+	self.session.on('storage', function() {
 
-			self.session.on('storage', function() {
+		// Calculate changes.
+		var changes = diff.diff(self.previous, self.session, function(path, key) {
 
-				// Calculate changes.
-				var changes = diff.diff(self.previous, self.session, function(path, key) {
+			var chain = [].concat(path, key);
 
-					var chain = [].concat(path, key);
+			function reducer(memo, item) {
+				return memo && memo[item];
+			}
 
-					function reducer(memo, item) {
-						return memo && memo[item];
-					}
+			var value = _.reduce(chain, reducer, self.session)
+				|| _.reduce(chain, reducer, self.previous);
 
-					var value = _.reduce(chain, reducer, self.session)
-						|| _.reduce(chain, reducer, self.previous);
+			return _.isFunction(value);
 
-					return _.isFunction(value);
+		});
 
-				});
-
-				if (_.isEmpty(changes)) {
-					return;
-				}
-
-				_.each(changes, self.changeProcessor);
-
-				self.previous = _.clone(self.session);
-
-			});
-
-			self.socket.on('open', function() {
-				var socket = this;
-
-				self.changeProcessor = function(change) {
-
-					// Encode the change into a protocol buffer.
-					var payload = new Update(change).encode().toBase64();
-
-					// Send it down the socket.
-					console.log('Sending update down websocket.');
-					socket.send(payload);
-
-				};
-
-				_.each(self.pendingChanges, self.changeProcessor);
-
-			});
-
+		if (_.isEmpty(changes)) {
+			return;
 		}
-	}
 
-	if (typeof(module) !== 'undefined') {
-		module.exports = init();
-	} else if (typeof(define) !== 'undefined') {
-		define('session-synch', [
-		], init);
-	}
+		_.each(changes, self.changeProcessor);
 
-})(this);
+		self.previous = _.clone(self.session);
+
+	});
+
+	self.socket.on('open', function() {
+		var socket = this;
+
+		self.changeProcessor = function(change) {
+
+			// Encode the change into a protocol buffer.
+			var payload = new Update(change).encode().toBase64();
+
+			// Send it down the socket.
+			console.log('Sending update down websocket.');
+			socket.send(payload);
+
+		};
+
+		_.each(self.pendingChanges, self.changeProcessor);
+
+	});
+
+};

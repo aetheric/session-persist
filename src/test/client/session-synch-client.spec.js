@@ -3,7 +3,6 @@
 var _ = require('underscore');
 var expect = require('chai').expect;
 var WebSocket = require('ws');
-var sinon = require('sinon');
 var repeat = require('repeat');
 var proto = require('protobufjs');
 var diff = require('deep-diff');
