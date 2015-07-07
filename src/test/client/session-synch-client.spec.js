@@ -44,17 +44,20 @@ describe('The session sync client', function() {
 			});
 		});
 
-		listeners = {};
+		listeners = {
+			storage: []
+		};
 
 		browser = {
 
 			location: 'http://localhost:' + port + '/',
 
 			sessionStorage: {
-				blah: 'argh',
-				on: function(event, callback) {
-					(listeners[event] || (listeners[event] = [])).push(callback);
-				}
+				blah: 'argh'
+			},
+
+			onstorage: function(callback) {
+				listeners.storage.push(callback);
 			}
 
 		};

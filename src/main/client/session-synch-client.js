@@ -38,7 +38,7 @@ module.exports = function(window) {
 		self.pendingChanges.push(change);
 	};
 
-	self.session.on('storage', function() {
+	root.onstorage(function(event) {
 
 		// Calculate changes.
 		var changes = diff.diff(self.previous, self.session, function(path, key) {
