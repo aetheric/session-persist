@@ -1,6 +1,6 @@
 {
   "name": "sockit",
-  "version": "0.0.0",
+  "version": "0.0.1",
   "description": "A session persistence and syncing framework.",
   "homepage": "https://github.com/aetheric/sockit",
   "author": "Peter Cummuskey <peterc@aetheric.co.nz> (http://gplus.to/tzrlk/)",
